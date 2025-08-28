@@ -46,8 +46,8 @@ export default function UploadPage() {
       });
 
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Failed to upload video");
+    } catch (err) {
+      setError((err as Error).message || "Failed to upload video");
       setIsUploading(false);
     }
   };

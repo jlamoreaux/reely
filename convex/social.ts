@@ -13,7 +13,7 @@ export const toggleFollow = mutation({
 
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
       .first();
 
     if (!currentUser) {
@@ -82,7 +82,7 @@ export const isFollowing = query({
 
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
       .first();
 
     if (!currentUser) {
@@ -165,7 +165,7 @@ export const toggleLike = mutation({
 
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
       .first();
 
     if (!currentUser) {
@@ -224,7 +224,7 @@ export const isLiked = query({
 
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
       .first();
 
     if (!currentUser) {
@@ -279,7 +279,7 @@ export const toggleBookmark = mutation({
 
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
       .first();
 
     if (!currentUser) {
@@ -329,7 +329,7 @@ export const getUserBookmarks = query({
 
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
       .first();
 
     if (!currentUser) {

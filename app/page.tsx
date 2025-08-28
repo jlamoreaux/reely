@@ -96,7 +96,7 @@ export default function Home() {
 
         {/* Video Feed */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {feedData?.videos.map((video: any) => (
+          {feedData?.videos.map((video) => (
             <VideoCard key={video._id} video={video} />
           ))}
         </div>
@@ -121,7 +121,7 @@ interface VideoWithUser {
     displayName: string;
     username: string;
     isVerified: boolean;
-  };
+  } | null;
   description?: string;
   viewCount: number;
   likeCount: number;

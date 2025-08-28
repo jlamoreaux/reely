@@ -22,7 +22,7 @@ export const uploadVideo = mutation({
     // Get the user profile
     const user = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
       .first();
 
     if (!user) {
@@ -68,16 +68,53 @@ export const getVideoById = query({
     }
 
     const user = await ctx.db.get(video.userId);
-    
-    // Increment view count (in a real app, this would be debounced/rate-limited)
-    await ctx.db.patch(args.videoId, {
-      viewCount: video.viewCount + 1,
-    });
 
     return {
       ...video,
       user,
     };
+  },
+});
+
+// Separate mutation to record a video view
+export const recordView = mutation({
+  args: { 
+    videoId: v.id("videos"),
+    watchTime: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const authUserId = await auth.getUserId(ctx);
+    
+    const video = await ctx.db.get(args.videoId);
+    if (!video || video.isDeleted) {
+      throw new Error("Video not found");
+    }
+
+    // Increment view count
+    await ctx.db.patch(args.videoId, {
+      viewCount: video.viewCount + 1,
+    });
+
+    // Record view in views table if user is authenticated
+    if (authUserId) {
+      const user = await ctx.db
+        .query("users")
+        .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
+        .first();
+      
+      if (user) {
+        await ctx.db.insert("views", {
+          userId: user._id,
+          videoId: args.videoId,
+          watchTime: args.watchTime || 0,
+          completed: false,
+          sessionId: `${user._id}-${Date.now()}`,
+          createdAt: Date.now(),
+        });
+      }
+    }
+
+    return { success: true };
   },
 });
 
@@ -96,7 +133,7 @@ export const getFeedVideos = query({
       // Get current user
       const currentUser = await ctx.db
         .query("users")
-        .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+        .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
         .first();
 
       if (!currentUser) {
@@ -226,7 +263,7 @@ export const deleteVideo = mutation({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", authUserId as any))
       .first();
 
     if (!user || video.userId !== user._id) {

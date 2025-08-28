@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useParams, useRouter } from "next/navigation";
@@ -173,7 +173,7 @@ export default function ProfilePage() {
         <div>
           <h3 className="text-lg font-semibold mb-4">Videos</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {userVideos?.videos.map((video: any) => (
+            {userVideos?.videos.map((video) => (
               <Link key={video._id} href={`/video/${video._id}`}>
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
                   {/* Thumbnail placeholder */}

@@ -23,10 +23,10 @@ export const createOrUpdateUser = mutation({
     // Check if user already exists
     const existingUser = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", userId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", userId as any))
       .first();
 
-    if (existingUsername && existingUsername.authUserId !== userId) {
+    if (existingUsername && existingUsername.authUserId !== (userId as any)) {
       throw new Error("Username already taken");
     }
 
@@ -41,15 +41,21 @@ export const createOrUpdateUser = mutation({
     } else {
       // Create new user
       const newUserId = await ctx.db.insert("users", {
-        authUserId: userId,
+        authUserId: userId as any,
         username: args.username,
         displayName: args.displayName,
         bio: args.bio,
         isVerified: false,
         createdAt: Date.now(),
+        updatedAt: Date.now(),
         followerCount: 0,
         followingCount: 0,
         videoCount: 0,
+        settings: {
+          isPrivate: false,
+          allowMessages: true,
+          allowComments: true,
+        },
       });
       return newUserId;
     }
@@ -65,7 +71,7 @@ export const getCurrentUser = query({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", userId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", userId as any))
       .first();
 
     return user;
@@ -120,7 +126,7 @@ export const updateProfileImage = mutation({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_auth_user", (q) => q.eq("authUserId", userId))
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", userId as any))
       .first();
 
     if (!user) {

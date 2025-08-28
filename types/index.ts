@@ -288,7 +288,7 @@ export interface VideoUploadForm {
 
 // Utility Types
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-export type Required<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+export type RequiredFields<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 
 // Enum Types
 export enum VideoStatus {
