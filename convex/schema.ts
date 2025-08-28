@@ -16,8 +16,9 @@ export default defineSchema({
     bio: v.optional(v.string()),
     profileImage: v.optional(v.string()),
     
-    // Verification
+    // Verification and creator status
     isVerified: v.boolean(),
+    isCreator: v.boolean(),
     verificationDomain: v.optional(v.string()),
     
     // Statistics (denormalized for performance)
@@ -30,6 +31,7 @@ export default defineSchema({
       isPrivate: v.boolean(),
       allowMessages: v.boolean(),
       allowComments: v.boolean(),
+      allowTips: v.boolean(),
     }),
     
     // Timestamps
@@ -39,6 +41,7 @@ export default defineSchema({
     .index("by_username", ["username"])
     .index("by_auth_user", ["authUserId"])
     .index("by_email", ["email"])
+    .index("by_is_creator", ["isCreator"])
     .searchIndex("search_users", {
       searchField: "username",
       filterFields: ["isVerified"],
@@ -61,6 +64,7 @@ export default defineSchema({
     likeCount: v.number(),
     commentCount: v.number(),
     shareCount: v.number(),
+    tipCount: v.number(),
     
     // Status
     isDeleted: v.boolean(),
@@ -69,6 +73,13 @@ export default defineSchema({
       v.literal("ready"),
       v.literal("failed")
     ),
+    
+    // Creator features
+    isLive: v.boolean(),
+    isDuet: v.boolean(),
+    duetWithId: v.optional(v.id("videos")),
+    scheduledAt: v.optional(v.number()),
+    publishedAt: v.optional(v.number()),
     
     // Metadata for anti-upload enforcement
     metadata: v.object({
@@ -85,6 +96,7 @@ export default defineSchema({
     .index("by_user", ["userId", "createdAt"])
     .index("by_created", ["createdAt"])
     .index("by_status", ["status", "createdAt"])
+    .index("by_scheduled", ["scheduledAt"])
     .index("by_popularity", ["likeCount", "createdAt"]),
 
   follows: defineTable({
@@ -195,4 +207,185 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_user", ["userId", "createdAt"]),
+
+  // CREATOR FEATURES - Phase 4 additions
+
+  // Analytics events for creator dashboard
+  analytics: defineTable({
+    videoId: v.id("videos"),
+    userId: v.id("users"), // Creator user ID
+    eventType: v.union(
+      v.literal("view"),
+      v.literal("like"),
+      v.literal("comment"),
+      v.literal("share"),
+      v.literal("tip"),
+      v.literal("watch_time")
+    ),
+    viewerId: v.optional(v.id("users")),
+    viewerDemographics: v.optional(v.object({
+      country: v.optional(v.string()),
+      region: v.optional(v.string()),
+      deviceType: v.optional(v.string()),
+      ageRange: v.optional(v.string()),
+    })),
+    watchDuration: v.optional(v.number()),
+    timestamp: v.number(),
+    hour: v.number(), // 0-23 for best time analysis
+    dayOfWeek: v.number(), // 0-6 for best time analysis
+  })
+    .index("by_video", ["videoId", "timestamp"])
+    .index("by_user", ["userId", "timestamp"])
+    .index("by_user_event", ["userId", "eventType", "timestamp"])
+    .index("by_time", ["userId", "hour", "dayOfWeek"]),
+
+  // Creator performance trends
+  creatorStats: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD format
+    totalViews: v.number(),
+    totalLikes: v.number(),
+    totalComments: v.number(),
+    totalShares: v.number(),
+    totalTips: v.number(),
+    totalWatchTime: v.number(),
+    uniqueViewers: v.number(),
+    newFollowers: v.number(),
+    avgEngagementRate: v.number(),
+    topPerformingVideoId: v.optional(v.id("videos")),
+  })
+    .index("by_user_date", ["userId", "date"]),
+
+  // Tips and monetization
+  tips: defineTable({
+    fromUserId: v.id("users"),
+    toUserId: v.id("users"),
+    videoId: v.optional(v.id("videos")),
+    amount: v.number(),
+    currency: v.string(),
+    message: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("completed"),
+      v.literal("failed"),
+      v.literal("refunded")
+    ),
+    stripeIntentId: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_sender", ["fromUserId", "createdAt"])
+    .index("by_recipient", ["toUserId", "createdAt"])
+    .index("by_video", ["videoId"]),
+
+  // Creator fund and earnings
+  creatorEarnings: defineTable({
+    userId: v.id("users"),
+    month: v.string(), // YYYY-MM format
+    viewEarnings: v.number(),
+    engagementEarnings: v.number(),
+    tipEarnings: v.number(),
+    sponsorshipEarnings: v.number(),
+    totalEarnings: v.number(),
+    paidOut: v.boolean(),
+    paidOutAt: v.optional(v.number()),
+  })
+    .index("by_user_month", ["userId", "month"]),
+
+  // Premium badges and features
+  premiumBadges: defineTable({
+    userId: v.id("users"),
+    badgeType: v.union(
+      v.literal("verified"),
+      v.literal("top_creator"),
+      v.literal("rising_star"),
+      v.literal("community_favorite"),
+      v.literal("consistent_creator")
+    ),
+    earnedAt: v.number(),
+    expiresAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"]),
+
+  // Live streaming sessions
+  liveStreams: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    thumbnailUrl: v.optional(v.string()),
+    streamKey: v.string(),
+    streamUrl: v.string(),
+    status: v.union(
+      v.literal("scheduled"),
+      v.literal("live"),
+      v.literal("ended"),
+      v.literal("cancelled")
+    ),
+    scheduledAt: v.optional(v.number()),
+    startedAt: v.optional(v.number()),
+    endedAt: v.optional(v.number()),
+    viewerCount: v.number(),
+    peakViewerCount: v.number(),
+  })
+    .index("by_user", ["userId", "scheduledAt"])
+    .index("by_status", ["status"])
+    .index("by_scheduled", ["scheduledAt"]),
+
+  // Duet collaborations
+  duetRequests: defineTable({
+    fromUserId: v.id("users"),
+    toUserId: v.id("users"),
+    originalVideoId: v.id("videos"),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("accepted"),
+      v.literal("declined"),
+      v.literal("expired")
+    ),
+    message: v.optional(v.string()),
+    createdAt: v.number(),
+    respondedAt: v.optional(v.number()),
+  })
+    .index("by_sender", ["fromUserId", "createdAt"])
+    .index("by_recipient", ["toUserId", "status", "createdAt"]),
+
+  // Scheduled posts
+  scheduledPosts: defineTable({
+    userId: v.id("users"),
+    videoData: v.string(), // Base64 or storage reference
+    thumbnailUrl: v.string(),
+    duration: v.number(),
+    description: v.optional(v.string()),
+    scheduledFor: v.number(),
+    status: v.union(
+      v.literal("scheduled"),
+      v.literal("published"),
+      v.literal("cancelled"),
+      v.literal("failed")
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId", "scheduledFor"])
+    .index("by_scheduled", ["scheduledFor", "status"]),
+
+  // Sponsored content guidelines acceptance
+  sponsorshipAgreements: defineTable({
+    userId: v.id("users"),
+    version: v.string(),
+    acceptedAt: v.number(),
+    ipAddress: v.optional(v.string()),
+  })
+    .index("by_user", ["userId", "acceptedAt"]),
+
+  // Best time to post analysis
+  postPerformance: defineTable({
+    userId: v.id("users"),
+    hour: v.number(), // 0-23
+    dayOfWeek: v.number(), // 0-6
+    avgViews: v.number(),
+    avgEngagement: v.number(),
+    sampleSize: v.number(),
+    lastUpdated: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_time", ["userId", "hour", "dayOfWeek"]),
 });
