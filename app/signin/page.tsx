@@ -11,7 +11,10 @@ export default function SignIn() {
   const router = useRouter();
   return (
     <div className="flex flex-col gap-8 w-96 mx-auto h-screen justify-center items-center">
-      <p>Log in to see the numbers</p>
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-2">Reely</h1>
+        <p className="text-gray-600">Authentic moments, real connections</p>
+      </div>
       <form
         className="flex flex-col gap-2"
         onSubmit={(e) => {

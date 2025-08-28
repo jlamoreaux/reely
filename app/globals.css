@@ -1,26 +1,332 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary Color Palette - Sage Green */
+  --sage-50: #F3F5F4;
+  --sage-100: #E8EDE9;
+  --sage-200: #D1DBD4;
+  --sage-300: #A5BAAC;
+  --sage-400: #7C9885; /* Primary Brand Color */
+  --sage-500: #5F7A67;
+  --sage-600: #4A6051;
+  --sage-700: #3B4D41;
+  --sage-800: #2F3D34;
+  --sage-900: #1F2922;
+
+  /* Secondary Color Palette - Cream */
+  --cream-50: #FEFEF9;
+  --cream-100: #FDFDF3;
+  --cream-200: #FAF9E6;
+  --cream-300: #F5F5DC; /* Background */
+  --cream-400: #E8E5C8;
+
+  /* Accent Color Palette - Teal */
+  --teal-400: #4A8B8B;
+  --teal-500: #3A7575;
+  --teal-600: #2C5F5F; /* Accent */
+  --teal-700: #224A4A;
+  --teal-800: #1A3838;
+
+  /* Semantic Colors */
+  --color-primary: var(--sage-400);
+  --color-secondary: var(--teal-600);
+  --color-background: var(--cream-300);
+  --color-foreground: #333333;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-inverse: #FFFFFF;
+  
+  --color-success: #5CB85C;
+  --color-warning: #F0AD4E;
+  --color-error: #D9534F;
+  --color-info: #5BC0DE;
+
+  /* Border & Shadow Colors */
+  --border-light: #E0E0E0;
+  --border-medium: #CCCCCC;
+  --shadow-color: rgba(0, 0, 0, 0.08);
+
+  /* Typography Scale */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Spacing System */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Animation Timing */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Animation Durations */
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  /* Z-Index Scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-overlay: 1030;
+  --z-modal: 1040;
+  --z-popover: 1050;
+  --z-tooltip: 1060;
+  --z-toast: 1070;
+
+  /* Component Specific Variables */
+  --header-height: 56px;
+  --bottom-nav-height: 56px;
+  --record-button-size: 72px;
+  --max-content-width: 1280px;
+  --video-max-width: 428px;
+
+  /* Breakpoints for JS usage */
+  --breakpoint-mobile: 320px;
+  --breakpoint-mobile-lg: 428px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-desktop-lg: 1440px;
 }
 
+/* Tailwind v4 theme configuration */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --font-sans: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-mono: 'SF Mono', 'Monaco', 'Courier New', monospace;
 }
 
+/* Dark mode support (future implementation) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-background: #1A1A1A;
+    --color-foreground: #FFFFFF;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B3B3B3;
+    --text-tertiary: #808080;
+    --sage-400: #8FA798; /* Lighter sage for dark mode */
+    --border-light: #333333;
+    --border-medium: #4D4D4D;
   }
 }
 
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Focus Styles for Accessibility */
+:focus-visible {
+  outline: 2px solid var(--sage-400);
+  outline-offset: 2px;
+}
+
+/* Button Reset */
+button {
+  font: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Link Reset */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Form Elements Reset */
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Image Reset */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* List Reset */
+ul,
+ol {
+  list-style: none;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sage-300);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sage-400);
+}
+
+/* Utility Classes */
+.container {
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+/* Animation Classes */
+@keyframes like-bounce {
+  0% { transform: scale(1); }
+  25% { transform: scale(0.8); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-like {
+  animation: like-bounce 0.6s var(--ease-in-out);
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-in-out);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--cream-200) 25%, var(--cream-100) 50%, var(--cream-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Visually Hidden (for screen readers) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Safe Area Support for Mobile */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Video Feed Container */
+.video-feed {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.video-feed::-webkit-scrollbar {
+  display: none;
+}
+
+.video-item {
+  height: 100vh;
+  scroll-snap-align: start;
+  position: relative;
+}
+
+/* Disable Pull-to-Refresh on Chrome Mobile */
+body {
+  overscroll-behavior-y: contain;
 }
