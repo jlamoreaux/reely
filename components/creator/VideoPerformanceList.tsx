@@ -41,11 +41,8 @@ const mockVideos = [
   },
 ];
 
-export default function VideoPerformanceList({ 
-  userId, 
-  timeRange 
-}: VideoPerformanceListProps) {
-  // In a real app, this would fetch data using userId and timeRange
+export default function VideoPerformanceList({}: VideoPerformanceListProps) {
+  // In a real app, this would fetch data using userId and timeRange from props
   
   return (
     <div className="space-y-4">

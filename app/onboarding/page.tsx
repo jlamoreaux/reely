@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useConvexAuth } from "convex/react";
+import AuthenticatedLayout from "@/components/layouts/AuthenticatedLayout";
+import { Card, Text, Button, Input, TextArea } from "@/components/ui";
 
 export default function Onboarding() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -40,103 +42,97 @@ export default function Onboarding() {
         bio: bio || undefined,
       });
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Failed to create profile");
+    } catch (err) {
+      setError((err as Error).message || "Failed to create profile");
       setIsSubmitting(false);
     }
   };
 
   if (isLoading || (currentUser && currentUser.username)) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-500">Loading...</p>
-      </div>
+      <AuthenticatedLayout className="flex items-center justify-center min-h-[80vh]">
+        <Text color="tertiary">Loading...</Text>
+      </AuthenticatedLayout>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 pt-20">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">Welcome to Reely!</h1>
-        <p className="text-gray-600">Let's set up your profile</p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label
-            htmlFor="username"
-            className="block text-sm font-medium mb-2"
-          >
-            Username
-          </label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="johndoe"
-            required
-            pattern="[a-zA-Z0-9_]+"
-            minLength={3}
-            maxLength={20}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Letters, numbers, and underscores only
-          </p>
+    <AuthenticatedLayout maxWidth="md" showHeader={false}>
+      <Card className="mt-20" padding="lg">
+        <div className="text-center mb-8">
+          <Text as="h1" size="3xl" weight="bold" color="sage-600">Welcome to Reely!</Text>
+          <Text size="lg" color="secondary" className="mt-2">Let&apos;s set up your profile</Text>
         </div>
 
-        <div>
-          <label
-            htmlFor="displayName"
-            className="block text-sm font-medium mb-2"
-          >
-            Display Name
-          </label>
-          <input
-            type="text"
-            id="displayName"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="John Doe"
-            required
-            maxLength={50}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="bio" className="block text-sm font-medium mb-2">
-            Bio (optional)
-          </label>
-          <textarea
-            id="bio"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="Tell us about yourself..."
-            rows={3}
-            maxLength={150}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            {bio.length}/150 characters
-          </p>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-sm text-red-600">{error}</p>
+        <form onSubmit={handleSubmit} className="space-y-7">
+          <div>
+            <Text as="label" size="sm" weight="medium" color="primary" className="block mb-2">
+              Username
+            </Text>
+            <Input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="johndoe"
+              required
+              pattern="[a-zA-Z0-9_]+"
+              minLength={3}
+              maxLength={20}
+            />
+            <Text size="xs" color="tertiary" className="mt-1">
+              Letters, numbers, and underscores only
+            </Text>
           </div>
-        )}
 
-        <button
-          type="submit"
-          disabled={isSubmitting || !username || !displayName}
-          className="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-        >
-          {isSubmitting ? "Creating Profile..." : "Complete Setup"}
-        </button>
-      </form>
-    </div>
+          <div>
+            <Text as="label" size="sm" weight="medium" color="primary" className="block mb-2">
+              Display Name
+            </Text>
+            <Input
+              type="text"
+              id="displayName"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="John Doe"
+              required
+              maxLength={50}
+            />
+          </div>
+
+          <div>
+            <Text as="label" size="sm" weight="medium" color="primary" className="block mb-2">
+              Bio (optional)
+            </Text>
+            <TextArea
+              id="bio"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Tell us about yourself..."
+              rows={3}
+              maxLength={150}
+            />
+            <Text size="xs" color="tertiary" className="mt-1">
+              {bio.length}/150 characters
+            </Text>
+          </div>
+
+          {error && (
+            <Card variant="outlined" className="bg-red-50 border-red-200" padding="sm">
+              <Text size="sm" className="text-red-600">{error}</Text>
+            </Card>
+          )}
+
+          <Button
+            type="submit"
+            disabled={isSubmitting || !username || !displayName}
+            className="w-full mt-8"
+            isLoading={isSubmitting}
+          >
+            {isSubmitting ? "Creating Profile..." : "Complete Setup"}
+          </Button>
+        </form>
+      </Card>
+    </AuthenticatedLayout>
   );
 }

@@ -185,8 +185,8 @@ export const publishScheduledPosts = internalMutation({
       .query("scheduledPosts")
       .withIndex("by_scheduled", q => 
         q.lte("scheduledFor", now)
-         .eq("status", "scheduled")
       )
+      .filter(q => q.eq(q.field("status"), "scheduled"))
       .collect();
     
     for (const post of postsToPublish) {
@@ -216,6 +216,8 @@ export const publishScheduledPosts = internalMutation({
           scheduledAt: post.scheduledFor,
           publishedAt: now,
           createdAt: now,
+          updatedAt: now,
+          status: "ready",
           metadata: {
             deviceType: "scheduled",
             appVersion: "1.0",
@@ -230,7 +232,7 @@ export const publishScheduledPosts = internalMutation({
         
         // Update profile video count
         await ctx.db.patch(post.userId, {
-          videoCount: user.videoCount + 1,
+          videoCount: (user.videoCount || 0) + 1,
         });
         
       } catch (error) {

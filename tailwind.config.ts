@@ -9,44 +9,44 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary Palette - Sage Green
+        // Primary Palette - Sage Green (using CSS variables)
         sage: {
-          50: '#F3F5F4',
-          100: '#E8EDE9',
-          200: '#D1DBD4',
-          300: '#A5BAAC',
-          400: '#7C9885', // Primary Brand Color
-          500: '#5F7A67',
-          600: '#4A6051',
-          700: '#3B4D41',
-          800: '#2F3D34',
-          900: '#1F2922',
+          50: 'var(--sage-50)',
+          100: 'var(--sage-100)',
+          200: 'var(--sage-200)',
+          300: 'var(--sage-300)',
+          400: 'var(--sage-400)',
+          500: 'var(--sage-500)',
+          600: 'var(--sage-600)',
+          700: 'var(--sage-700)',
+          800: 'var(--sage-800)',
+          900: 'var(--sage-900)',
         },
         // Secondary Palette - Cream
         cream: {
-          50: '#FEFEF9',
-          100: '#FDFDF3',
-          200: '#FAF9E6',
-          300: '#F5F5DC', // Background
-          400: '#E8E5C8',
+          50: 'var(--cream-50)',
+          100: 'var(--cream-100)',
+          200: 'var(--cream-200)',
+          300: 'var(--cream-300)',
+          400: 'var(--cream-400)',
         },
         // Accent - Teal
         teal: {
-          400: '#4A8B8B',
-          500: '#3A7575',
-          600: '#2C5F5F', // Accent
-          700: '#224A4A',
-          800: '#1A3838',
+          400: 'var(--teal-400)',
+          500: 'var(--teal-500)',
+          600: 'var(--teal-600)',
+          700: 'var(--teal-700)',
+          800: 'var(--teal-800)',
         },
         // Semantic Colors
-        primary: '#7C9885', // sage-400
-        secondary: '#2C5F5F', // teal-600
-        background: '#F5F5DC', // cream-300
-        foreground: '#333333',
-        success: '#5CB85C',
-        warning: '#F0AD4E',
-        error: '#D9534F',
-        info: '#5BC0DE',
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        background: 'var(--color-background)',
+        foreground: 'var(--color-foreground)',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        error: 'var(--color-error)',
+        info: 'var(--color-info)',
       },
       fontFamily: {
         sans: [
@@ -122,7 +122,7 @@ const config: Config = {
         'full': '9999px',
       },
       boxShadow: {
-        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'soft': '0 2px 8px var(--shadow-color)',
         'medium': '0 4px 16px rgba(0, 0, 0, 0.12)',
         'large': '0 8px 32px rgba(0, 0, 0, 0.16)',
       },

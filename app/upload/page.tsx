@@ -2,162 +2,256 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import Link from "next/link";
 import { useConvexAuth } from "convex/react";
+import AuthenticatedLayout from "@/components/layouts/AuthenticatedLayout";
+import { Card, Text, Button, TextArea, VideoPlayer, PageContainer } from "@/components/ui";
+import VideoRecorder from "@/components/video/VideoRecorder";
+import ThumbnailSelector from "@/components/video/ThumbnailSelector";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function UploadPage() {
   const router = useRouter();
   const { isAuthenticated } = useConvexAuth();
   const currentUser = useQuery(api.users.getCurrentUser);
-  const uploadVideo = useMutation(api.videos.uploadVideo);
   
+  const [step, setStep] = useState<'record' | 'thumbnail' | 'details' | 'uploading'>('record');
+  const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
+  const [thumbnailBlob, setThumbnailBlob] = useState<Blob | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [stagedVideoId, setStagedVideoId] = useState<Id<"videos"> | null>(null);
+  const [videoStorageId, setVideoStorageId] = useState<string | null>(null);
+  const [thumbnailStorageId, setThumbnailStorageId] = useState<string | null>(null);
   const [description, setDescription] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const confirmVideoUpload = useMutation(api.videos.confirmVideoUpload);
+  const cancelVideoUpload = useMutation(api.videos.cancelVideoUpload);
 
-  const handleUpload = async () => {
-    if (!currentUser) {
-      router.push("/signin");
+  // Handle recording complete - video is already uploaded
+  const handleRecordingComplete = async (
+    stagedId: Id<"videos">,
+    videoStorage: string,
+    thumbnailStorage: string,
+    blob: Blob,
+    thumbUrl: string
+  ) => {
+    setStagedVideoId(stagedId);
+    setVideoStorageId(videoStorage);
+    setThumbnailStorageId(thumbnailStorage);
+    setVideoBlob(blob);
+    setThumbnailUrl(thumbUrl);
+    
+    // Convert thumbnail URL to blob for selector
+    try {
+      const response = await fetch(thumbUrl);
+      const thumbBlob = await response.blob();
+      setThumbnailBlob(thumbBlob);
+    } catch (err) {
+      console.error('Failed to process thumbnail:', err);
+    }
+    
+    setStep('thumbnail');
+  };
+
+  // Handle thumbnail selection
+  const handleThumbnailSelect = (blob: Blob) => {
+    setThumbnailBlob(blob);
+  };
+
+  // Handle final confirmation
+  const handleConfirm = async () => {
+    if (!currentUser || !stagedVideoId) {
       return;
     }
 
-    setIsUploading(true);
+    setStep('uploading');
     setError(null);
 
     try {
-      // In a real implementation, this would:
-      // 1. Access the device camera
-      // 2. Record video directly
-      // 3. Upload to storage
-      // 4. Create video record
-      
-      // For now, we'll create a mock video
-      await uploadVideo({
-        videoUrl: "https://example.com/video.mp4", // Placeholder
-        thumbnailUrl: "https://example.com/thumb.jpg", // Placeholder
-        duration: 30,
+      await confirmVideoUpload({
+        stagedVideoId,
         description: description || undefined,
-        deviceMetadata: {
-          deviceType: "web",
-          appVersion: "1.0.0",
-        },
       });
-
-      router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Failed to upload video");
-      setIsUploading(false);
+      
+      setShowToast(true);
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+    } catch (err) {
+      console.error('Confirm error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to publish video');
+      setStep('details');
     }
+  };
+
+  // Handle cancel
+  const handleCancel = async () => {
+    if (stagedVideoId && videoStorageId && thumbnailStorageId) {
+      try {
+        await cancelVideoUpload({
+          stagedVideoId,
+          videoStorageId,
+          thumbnailStorageId,
+        });
+      } catch (err) {
+        console.error('Failed to cancel upload:', err);
+      }
+    }
+    router.push('/');
   };
 
   if (!isAuthenticated || !currentUser) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-500">Please sign in to upload videos</p>
-      </div>
+      <AuthenticatedLayout className="flex items-center justify-center min-h-[80vh]">
+        <Text color="tertiary">Please sign in to upload videos</Text>
+      </AuthenticatedLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/">
-            <h1 className="text-2xl font-bold text-green-600">Reely</h1>
-          </Link>
-          
-          <Link
-            href="/"
-            className="text-gray-500 hover:text-gray-700"
-          >
-            Cancel
-          </Link>
-        </div>
-      </header>
+    <AuthenticatedLayout>
+      <PageContainer maxWidth="4xl">
+        {/* Recording Step */}
+        {step === 'record' && (
+          <VideoRecorder
+            onRecordingComplete={handleRecordingComplete}
+            onCancel={handleCancel}
+            minDuration={5}
+            maxDuration={180}
+          />
+        )}
 
-      <div className="max-w-2xl mx-auto px-4 pt-8">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold mb-6">Record Video</h2>
-          
-          {/* Camera placeholder */}
-          <div className="aspect-[9/16] max-w-sm mx-auto bg-gray-900 rounded-lg mb-6 relative">
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-              <svg
-                className="w-16 h-16 mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-              <p className="text-center">
-                Camera recording will be implemented here.
-                <br />
-                Only in-app recording will be allowed.
-              </p>
-            </div>
-          </div>
-          
-          {/* Description */}
-          <div className="mb-6">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium mb-2"
-            >
-              Description (optional)
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="What's this video about?"
-              rows={3}
-              maxLength={200}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {description.length}/200 characters
-            </p>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-
-          {/* Action buttons */}
-          <div className="flex gap-4">
-            <button
-              onClick={handleUpload}
-              disabled={isUploading}
-              className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              {isUploading ? "Uploading..." : "Upload Video (Mock)"}
-            </button>
+        {/* Thumbnail Selection Step */}
+        {step === 'thumbnail' && videoBlob && (
+          <Card padding="lg">
+            <Text as="h2" size="2xl" weight="bold" className="mb-6 text-center">
+              Select Thumbnail
+            </Text>
             
-            <Link
-              href="/"
-              className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 text-center"
-            >
-              Cancel
-            </Link>
+            <ThumbnailSelector
+              videoBlob={videoBlob}
+              onThumbnailSelect={handleThumbnailSelect}
+            />
+            
+            <div className="flex gap-3 mt-6 max-w-md mx-auto">
+              <Button
+                onClick={handleCancel}
+                variant="secondary"
+              >
+                Cancel Upload
+              </Button>
+              <Button
+                onClick={() => setStep('details')}
+                disabled={!thumbnailBlob}
+                className="flex-1"
+              >
+                Continue
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {/* Details Step */}
+        {step === 'details' && (
+          <Card padding="lg">
+            <Text as="h2" size="2xl" weight="bold" className="mb-6 text-center">
+              Add Details
+            </Text>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Video preview */}
+              <div>
+                {videoBlob && (
+                  <div className="max-w-sm mx-auto shadow-xl">
+                    <VideoPlayer
+                      src={URL.createObjectURL(videoBlob)}
+                      controls
+                      playsInline
+                      aspectRatio="9:16"
+                      fit="cover"
+                      rounded
+                    />
+                  </div>
+                )}
+              </div>
+              
+              {/* Form */}
+              <div className="flex flex-col justify-center">
+                {/* Description */}
+                <div className="mb-6">
+                  <Text as="label" htmlFor="description" size="sm" weight="medium" className="block mb-2">
+                    Description (optional)
+                  </Text>
+                  <TextArea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="What's this video about?"
+                    rows={4}
+                    maxLength={200}
+                  />
+                  <Text size="xs" color="tertiary" className="mt-1">
+                    {description.length}/200 characters
+                  </Text>
+                </div>
+
+                {error && (
+                  <Card variant="outlined" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 p-3 mb-4">
+                    <Text size="sm" className="text-red-600 dark:text-red-400">{error}</Text>
+                  </Card>
+                )}
+
+                {/* Action buttons */}
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => setStep('thumbnail')}
+                    variant="secondary"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    variant="secondary"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleConfirm}
+                    className="flex-1"
+                  >
+                    Post Video
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Upload Progress Step */}
+        {step === 'uploading' && (
+          <Card padding="lg" className="text-center">
+            <Text as="h2" size="2xl" weight="bold" className="mb-6">
+              Publishing Video
+            </Text>
+            
+            <div className="w-16 h-16 border-4 border-sage-200 border-t-sage-600 rounded-full animate-spin mx-auto mb-6" />
+            
+            <Text color="secondary">
+              Your video is being published...
+            </Text>
+          </Card>
+        )}
+
+        {/* Success message */}
+        {showToast && (
+          <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+            Video uploaded successfully!
           </div>
-          
-          <p className="text-xs text-gray-500 mt-4 text-center">
-            Note: In the production version, this will access your device camera
-            directly. No video uploads or editing will be allowed.
-          </p>
-        </div>
-      </div>
-    </div>
+        )}
+      </PageContainer>
+    </AuthenticatedLayout>
   );
 }

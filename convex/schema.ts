@@ -7,36 +7,44 @@ export default defineSchema({
   
   users: defineTable({
     // Auth linkage
-    authUserId: v.optional(v.id("authUsers")),
+    authUserId: v.optional(v.id("users")),
     email: v.optional(v.string()),
     
-    // Profile information
-    username: v.string(),
-    displayName: v.string(),
+    // Profile information - optional for auth users who haven't set up profiles yet
+    username: v.optional(v.string()),
+    displayName: v.optional(v.string()),
     bio: v.optional(v.string()),
     profileImage: v.optional(v.string()),
     
     // Verification and creator status
-    isVerified: v.boolean(),
-    isCreator: v.boolean(),
+    isVerified: v.optional(v.boolean()),
+    isCreator: v.optional(v.boolean()),
     verificationDomain: v.optional(v.string()),
     
     // Statistics (denormalized for performance)
-    followerCount: v.number(),
-    followingCount: v.number(),
-    videoCount: v.number(),
+    followerCount: v.optional(v.number()),
+    followingCount: v.optional(v.number()),
+    videoCount: v.optional(v.number()),
     
     // Settings
-    settings: v.object({
+    settings: v.optional(v.object({
       isPrivate: v.boolean(),
       allowMessages: v.boolean(),
       allowComments: v.boolean(),
-      allowTips: v.boolean(),
-    }),
+      allowTips: v.optional(v.boolean()),
+    })),
     
     // Timestamps
-    createdAt: v.number(),
-    updatedAt: v.number(),
+    createdAt: v.optional(v.number()),
+    updatedAt: v.optional(v.number()),
+    
+    // Auth system fields (from @convex-dev/auth)
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    phoneVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
   })
     .index("by_username", ["username"])
     .index("by_auth_user", ["authUserId"])
@@ -71,7 +79,8 @@ export default defineSchema({
     status: v.union(
       v.literal("processing"),
       v.literal("ready"),
-      v.literal("failed")
+      v.literal("failed"),
+      v.literal("staged") // For staged uploads
     ),
     
     // Creator features
@@ -82,12 +91,26 @@ export default defineSchema({
     publishedAt: v.optional(v.number()),
     
     // Metadata for anti-upload enforcement
-    metadata: v.object({
-      deviceType: v.string(),
-      appVersion: v.string(),
+    metadata: v.optional(v.object({
+      deviceType: v.optional(v.string()),
+      appVersion: v.optional(v.string()),
+      userAgent: v.optional(v.string()),
+      platform: v.optional(v.string()),
+      screenResolution: v.optional(v.string()),
+      timezone: v.optional(v.string()),
       recordedAt: v.number(),
-      signature: v.optional(v.string()), // For authenticity verification
-    }),
+      uploadedAt: v.optional(v.number()),
+      recordingSession: v.optional(v.string()),
+      signature: v.optional(v.object({
+        hash: v.string(),
+        size: v.number(),
+        deviceFingerprint: v.string(),
+      })),
+      storageIds: v.optional(v.object({
+        video: v.string(),
+        thumbnail: v.string(),
+      })),
+    })),
     
     // Timestamps
     createdAt: v.number(),

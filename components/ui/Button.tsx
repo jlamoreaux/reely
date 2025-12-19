@@ -5,10 +5,11 @@ import { cn } from '@/lib/utils'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
   isLoading?: boolean
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
+  as?: React.ElementType
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -21,25 +22,27 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     rightIcon,
     children,
     disabled,
+    as: Component = 'button',
     ...props 
   }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed'
     
     const variants = {
-      primary: 'bg-[#7C9885] text-white hover:bg-[#5F7A67] focus:ring-[#7C9885]',
-      secondary: 'bg-transparent text-[#7C9885] border border-[#7C9885] hover:bg-[#7C9885]/10 focus:ring-[#7C9885]',
-      ghost: 'bg-transparent text-[#666666] hover:bg-gray-100 focus:ring-gray-400',
-      danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500',
+      primary: 'bg-sage-600 text-white hover:bg-sage-700 active:bg-sage-800 focus:ring-sage-400 border-0 dark:bg-sage-500 dark:hover:bg-sage-600 dark:active:bg-sage-700',
+      secondary: 'bg-transparent text-sage-700 border border-sage-300 hover:bg-sage-50 active:bg-sage-100 focus:ring-sage-400 dark:text-sage-300 dark:border-sage-600 dark:hover:bg-sage-900 dark:active:bg-sage-800',
+      ghost: 'bg-transparent text-sage-700 hover:bg-sage-50 active:bg-sage-100 focus:ring-sage-400 border-0 dark:text-sage-300 dark:hover:bg-sage-900 dark:active:bg-sage-800',
+      danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-400 border-0 dark:bg-red-500 dark:hover:bg-red-600 dark:active:bg-red-700',
     }
     
     const sizes = {
-      sm: 'px-3 py-1.5 text-sm rounded-full',
-      md: 'px-6 py-3 text-base rounded-full',
-      lg: 'px-8 py-4 text-lg rounded-full',
+      xs: 'px-3 py-1.5 text-xs rounded-full',
+      sm: 'px-4 py-2 text-sm rounded-full',
+      md: 'px-6 py-2.5 text-base rounded-full',
+      lg: 'px-8 py-3 text-lg rounded-full',
     }
     
     return (
-      <button
+      <Component
         ref={ref}
         className={cn(
           baseStyles,
@@ -65,7 +68,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             {rightIcon && <span className="ml-2">{rightIcon}</span>}
           </>
         )}
-      </button>
+      </Component>
     )
   }
 )

@@ -35,7 +35,7 @@ export const acceptGuidelines = mutation({
       userId: args.userId,
       version: args.version,
       acceptedAt: Date.now(),
-      ipAddress: ctx.request?.headers?.get("x-forwarded-for") || undefined,
+      // IP address tracking would be done at the API level
     });
     
     return { message: "Guidelines accepted successfully" };

@@ -1,31 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 :root {
-  /* Primary Color Palette - Sage Green */
-  --sage-50: #F3F5F4;
-  --sage-100: #E8EDE9;
-  --sage-200: #D1DBD4;
-  --sage-300: #A5BAAC;
-  --sage-400: #7C9885; /* Primary Brand Color */
-  --sage-500: #5F7A67;
-  --sage-600: #4A6051;
-  --sage-700: #3B4D41;
-  --sage-800: #2F3D34;
-  --sage-900: #1F2922;
+  /* Primary Color Palette - Sage Green (More Muted) */
+  --sage-50: #FAFBFA;
+  --sage-100: #F5F7F5;
+  --sage-200: #E8ECE8;
+  --sage-300: #C6D2C7;
+  --sage-400: #8B9C8C; /* Primary Brand Color - Muted */
+  --sage-500: #6B7E6C;
+  --sage-600: #526352;
+  --sage-700: #404B40;
+  --sage-800: #2F3630;
+  --sage-900: #1F2420;
 
-  /* Secondary Color Palette - Cream */
-  --cream-50: #FEFEF9;
-  --cream-100: #FDFDF3;
-  --cream-200: #FAF9E6;
-  --cream-300: #F5F5DC; /* Background */
-  --cream-400: #E8E5C8;
+  /* Secondary Color Palette - Cream (Softer) */
+  --cream-50: #FEFEFD;
+  --cream-100: #FCFCFA;
+  --cream-200: #F9F8F5;
+  --cream-300: #F5F3ED; /* Background - Warmer */
+  --cream-400: #EAE6DC;
 
-  /* Accent Color Palette - Teal */
-  --teal-400: #4A8B8B;
-  --teal-500: #3A7575;
-  --teal-600: #2C5F5F; /* Accent */
-  --teal-700: #224A4A;
-  --teal-800: #1A3838;
+  /* Accent Color Palette - Teal (Refined) */
+  --teal-400: #5C8A8A;
+  --teal-500: #4B7575;
+  --teal-600: #3A6363; /* Accent - Deeper */
+  --teal-700: #2D4D4D;
+  --teal-800: #223A3A;
 
   /* Semantic Colors */
   --color-primary: var(--sage-400);
@@ -123,28 +124,112 @@
 @theme inline {
   --color-background: var(--color-background);
   --color-foreground: var(--color-foreground);
-  --font-sans: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-serif: 'Crimson Text', Georgia, 'Times New Roman', serif;
   --font-mono: 'SF Mono', 'Monaco', 'Courier New', monospace;
 }
 
-/* Dark mode support (future implementation) */
+/* Dark mode support with improved contrast */
+.dark {
+  /* Primary Color Palette - Sage Green (Dark Mode) */
+  --sage-50: #1F2420;
+  --sage-100: #2F3630;
+  --sage-200: #404B40;
+  --sage-300: #526352;
+  --sage-400: #8FA798; /* Lighter sage for dark mode */
+  --sage-500: #A4B4A5;
+  --sage-600: #B7C4B8;
+  --sage-700: #C9D2CA;
+  --sage-800: #DAE1DB;
+  --sage-900: #EAEEEA;
+
+  /* Secondary Color Palette - Cream (Dark Mode) */
+  --cream-50: #1A1915;
+  --cream-100: #242319;
+  --cream-200: #2E2C1E;
+  --cream-300: #383524; /* Background - Dark */
+  --cream-400: #4A4532;
+
+  /* Accent Color Palette - Teal (Dark Mode) */
+  --teal-400: #7FA9A9;
+  --teal-500: #93B5B5;
+  --teal-600: #A7C2C2;
+  --teal-700: #BBCECE;
+  --teal-800: #CFDADA;
+
+  /* Semantic Colors */
+  --color-primary: var(--sage-500);
+  --color-secondary: var(--teal-500);
+  --color-background: #0F0F0F;
+  --color-foreground: #F5F5F5;
+  --text-primary: #F5F5F5;
+  --text-secondary: #B3B3B3;
+  --text-tertiary: #808080;
+  --text-inverse: #0F0F0F;
+  
+  --color-success: #6FCF6F;
+  --color-warning: #F3C563;
+  --color-error: #E56B6B;
+  --color-info: #6BCDE8;
+
+  /* Border & Shadow Colors */
+  --border-light: #2A2A2A;
+  --border-medium: #404040;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: #1A1A1A;
-    --color-foreground: #FFFFFF;
-    --text-primary: #FFFFFF;
+    /* Primary Color Palette - Sage Green (Dark Mode) */
+    --sage-50: #1F2420;
+    --sage-100: #2F3630;
+    --sage-200: #404B40;
+    --sage-300: #526352;
+    --sage-400: #8FA798; /* Lighter sage for dark mode */
+    --sage-500: #A4B4A5;
+    --sage-600: #B7C4B8;
+    --sage-700: #C9D2CA;
+    --sage-800: #DAE1DB;
+    --sage-900: #EAEEEA;
+
+    /* Secondary Color Palette - Cream (Dark Mode) */
+    --cream-50: #1A1915;
+    --cream-100: #242319;
+    --cream-200: #2E2C1E;
+    --cream-300: #383524; /* Background - Dark */
+    --cream-400: #4A4532;
+
+    /* Accent Color Palette - Teal (Dark Mode) */
+    --teal-400: #7FA9A9;
+    --teal-500: #93B5B5;
+    --teal-600: #A7C2C2;
+    --teal-700: #BBCECE;
+    --teal-800: #CFDADA;
+
+    /* Semantic Colors */
+    --color-primary: var(--sage-500);
+    --color-secondary: var(--teal-500);
+    --color-background: #0F0F0F;
+    --color-foreground: #F5F5F5;
+    --text-primary: #F5F5F5;
     --text-secondary: #B3B3B3;
     --text-tertiary: #808080;
-    --sage-400: #8FA798; /* Lighter sage for dark mode */
-    --border-light: #333333;
-    --border-medium: #4D4D4D;
+    --text-inverse: #0F0F0F;
+    
+    --color-success: #6FCF6F;
+    --color-warning: #F3C563;
+    --color-error: #E56B6B;
+    --color-info: #6BCDE8;
+
+    /* Border & Shadow Colors */
+    --border-light: #2A2A2A;
+    --border-medium: #404040;
+    --shadow-color: rgba(0, 0, 0, 0.4);
   }
 }
 
 /* Base Styles */
-* {
-  margin: 0;
-  padding: 0;
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
@@ -158,7 +243,11 @@ body {
   color: var(--color-foreground);
   background: var(--color-background);
   font-family: var(--font-sans);
+  font-weight: 400;
   line-height: 1.5;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
@@ -276,6 +365,32 @@ ol {
   animation: fadeIn var(--duration-normal) var(--ease-in-out);
 }
 
+/* Typography Classes */
+.font-serif {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Refined Shadows */
+.shadow-subtle {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 
+              0 1px 3px 1px rgba(0, 0, 0, 0.02);
+}
+
+.shadow-soft {
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.04), 
+              0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.shadow-medium {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
 /* Loading Skeleton */
 .skeleton {
   position: relative;
@@ -347,6 +462,11 @@ ol {
   height: 100vh;
   scroll-snap-align: start;
   position: relative;
+}
+
+/* Mirror video for front camera (selfie mode) */
+.mirror {
+  transform: scaleX(-1);
 }
 
 /* Disable Pull-to-Refresh on Chrome Mobile */

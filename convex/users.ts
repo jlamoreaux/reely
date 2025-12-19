@@ -46,10 +46,18 @@ export const createOrUpdateUser = mutation({
         displayName: args.displayName,
         bio: args.bio,
         isVerified: false,
+        isCreator: false,
         createdAt: Date.now(),
+        updatedAt: Date.now(),
         followerCount: 0,
         followingCount: 0,
         videoCount: 0,
+        settings: {
+          isPrivate: false,
+          allowMessages: true,
+          allowComments: true,
+          allowTips: false,
+        },
       });
       return newUserId;
     }
@@ -100,8 +108,8 @@ export const searchUsers = query({
 
     const filtered = users.filter(
       (user) =>
-        user.username.toLowerCase().includes(searchTerm) ||
-        user.displayName.toLowerCase().includes(searchTerm)
+        (user.username && user.username.toLowerCase().includes(searchTerm)) ||
+        (user.displayName && user.displayName.toLowerCase().includes(searchTerm))
     );
 
     return filtered.slice(0, limit);

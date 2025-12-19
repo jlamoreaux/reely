@@ -4,13 +4,13 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAuthActions } from "@convex-dev/auth/react";
 import Link from "next/link";
+import AuthenticatedLayout from "@/components/layouts/AuthenticatedLayout";
+import { Card, Text, PageContainer } from "@/components/ui";
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
-  const { signOut } = useAuthActions();
   const currentUser = useQuery(api.users.getCurrentUser);
   const [feedType, setFeedType] = useState<"discover" | "following">("discover");
   
@@ -31,87 +31,63 @@ export default function Home() {
 
   if (isLoading || !currentUser) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-500">Loading...</p>
-      </div>
+      <AuthenticatedLayout className="flex items-center justify-center min-h-[80vh]">
+        <Text color="tertiary">Loading...</Text>
+      </AuthenticatedLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-green-600">Reely</h1>
-          
-          <nav className="flex items-center gap-6">
-            <Link
-              href="/upload"
-              className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700"
-            >
-              Upload Video
-            </Link>
-            
-            <Link
-              href={`/profile/${currentUser.username}`}
-              className="text-gray-700 hover:text-gray-900"
-            >
-              Profile
-            </Link>
-            
-            <button
-              onClick={() => signOut().then(() => router.push("/signin"))}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              Sign Out
-            </button>
-          </nav>
-        </div>
-      </header>
-
-      {/* Feed Tabs */}
-      <div className="max-w-6xl mx-auto px-4 pt-6">
-        <div className="flex gap-4 mb-6 border-b border-gray-200">
+    <AuthenticatedLayout>
+      <PageContainer maxWidth="6xl">
+        {/* Feed Tabs */}
+        <div className="mt-6 mb-6">
+        <div className="flex gap-8 mb-6 border-b border-sage-200/50">
           <button
             onClick={() => setFeedType("discover")}
-            className={`pb-3 px-1 font-medium transition ${
+            className={`pb-4 px-1 font-medium transition-colors duration-200 ${
               feedType === "discover"
-                ? "text-green-600 border-b-2 border-green-600"
-                : "text-gray-500 hover:text-gray-700"
+                ? "text-sage-700 border-b-2 border-sage-600"
+                : "text-sage-500 hover:text-sage-700"
             }`}
           >
-            Discover
+            <Text size="sm" weight={feedType === "discover" ? "medium" : "normal"}>
+              Discover
+            </Text>
           </button>
           <button
             onClick={() => setFeedType("following")}
-            className={`pb-3 px-1 font-medium transition ${
+            className={`pb-4 px-1 font-medium transition-colors duration-200 ${
               feedType === "following"
-                ? "text-green-600 border-b-2 border-green-600"
-                : "text-gray-500 hover:text-gray-700"
+                ? "text-sage-700 border-b-2 border-sage-600"
+                : "text-sage-500 hover:text-sage-700"
             }`}
           >
-            Following
+            <Text size="sm" weight={feedType === "following" ? "medium" : "normal"}>
+              Following
+            </Text>
           </button>
         </div>
 
         {/* Video Feed */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {feedData?.videos.map((video: any) => (
+          {feedData?.videos.map((video) => (
             <VideoCard key={video._id} video={video} />
           ))}
         </div>
 
         {feedData?.videos.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">
+            <Text size="lg" color="tertiary" weight="light" className="text-center">
               {feedType === "following"
                 ? "Follow creators to see their videos here"
                 : "No videos yet. Be the first to upload!"}
-            </p>
+            </Text>
           </div>
         )}
-      </div>
-    </div>
+        </div>
+      </PageContainer>
+    </AuthenticatedLayout>
   );
 }
 
@@ -125,48 +101,52 @@ interface VideoWithUser {
   description?: string;
   viewCount: number;
   likeCount: number;
+  videoUrl: string;
+  thumbnailUrl: string;
+  duration: number;
 }
 
 function VideoCard({ video }: { video: VideoWithUser }) {
   return (
     <Link href={`/video/${video._id}`}>
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
-        {/* Thumbnail placeholder */}
-        <div className="aspect-[9/16] bg-gray-200 relative">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg
-              className="w-12 h-12 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+      <Card className="overflow-hidden hover:shadow-soft transition-all duration-300 cursor-pointer" padding="none">
+        {/* Thumbnail */}
+        <div className="aspect-[9/16] bg-black relative overflow-hidden">
+          <img 
+            src={video.thumbnailUrl} 
+            alt={video.description || 'Video thumbnail'}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+          {/* Duration overlay */}
+          <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+            {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
+          </div>
+          {/* Play button overlay */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/20">
+            <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-sage-700 ml-1"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
           </div>
         </div>
         
         {/* Video info */}
         <div className="p-4">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-            <div>
-              <p className="font-medium text-sm">{video.user?.displayName}</p>
-              <p className="text-xs text-gray-500">@{video.user?.username}</p>
+            <div className="w-9 h-9 bg-sage-200/50 rounded-full"></div>
+            <div className="flex-1">
+              <Text size="sm" weight="medium">{video.user?.displayName}</Text>
+              <Text size="xs" color="tertiary">@{video.user?.username}</Text>
             </div>
             {video.user?.isVerified && (
               <svg
-                className="w-4 h-4 text-blue-500"
+                className="w-4 h-4 text-sage-500"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -180,17 +160,17 @@ function VideoCard({ video }: { video: VideoWithUser }) {
           </div>
           
           {video.description && (
-            <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+            <Text size="sm" color="secondary" className="mb-2 line-clamp-2">
               {video.description}
-            </p>
+            </Text>
           )}
           
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span>{video.viewCount} views</span>
-            <span>{video.likeCount} likes</span>
+          <div className="flex items-center gap-4">
+            <Text size="xs" color="tertiary">{video.viewCount} views</Text>
+            <Text size="xs" color="tertiary">{video.likeCount} likes</Text>
           </div>
         </div>
-      </div>
+      </Card>
     </Link>
   );
 }

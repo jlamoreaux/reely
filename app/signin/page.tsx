@@ -3,6 +3,7 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { PageLayout, Card, Text, Button, Input } from "@/components/ui";
 
 export default function SignIn() {
   const { signIn } = useAuthActions();
@@ -10,13 +11,15 @@ export default function SignIn() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   return (
-    <div className="flex flex-col gap-8 w-96 mx-auto h-screen justify-center items-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-2">Reely</h1>
-        <p className="text-gray-600">Authentic moments, real connections</p>
-      </div>
-      <form
-        className="flex flex-col gap-2"
+    <PageLayout className="flex items-center justify-center py-12">
+      <Card className="w-full max-w-md" padding="lg">
+        <div className="text-center mb-8">
+          <Text as="h1" size="5xl" weight="light" color="sage-700" serif>Reely</Text>
+          <Text size="base" color="tertiary" className="mt-4" weight="light">Authentic moments, real connections</Text>
+        </div>
+        
+        <form
+          className="flex flex-col gap-5"
         onSubmit={(e) => {
           e.preventDefault();
           const formData = new FormData(e.target as HTMLFormElement);
@@ -30,45 +33,49 @@ export default function SignIn() {
             });
         }}
       >
-        <input
-          className="bg-background text-foreground rounded-md p-2 border-2 border-slate-200 dark:border-slate-800"
-          type="email"
-          name="email"
-          placeholder="Email"
-        />
-        <input
-          className="bg-background text-foreground rounded-md p-2 border-2 border-slate-200 dark:border-slate-800"
-          type="password"
-          name="password"
-          placeholder="Password"
-        />
-        <button
-          className="bg-foreground text-background rounded-md"
-          type="submit"
-        >
-          {flow === "signIn" ? "Sign in" : "Sign up"}
-        </button>
-        <div className="flex flex-row gap-2">
-          <span>
-            {flow === "signIn"
-              ? "Don't have an account?"
-              : "Already have an account?"}
-          </span>
-          <span
-            className="text-foreground underline hover:no-underline cursor-pointer"
-            onClick={() => setFlow(flow === "signIn" ? "signUp" : "signIn")}
+          <Input
+            type="email"
+            name="email"
+            placeholder="Email"
+            required
+          />
+          <Input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <Button
+            type="submit"
+            className="mt-4"
           >
-            {flow === "signIn" ? "Sign up instead" : "Sign in instead"}
-          </span>
-        </div>
-        {error && (
-          <div className="bg-red-500/20 border-2 border-red-500/50 rounded-md p-2">
-            <p className="text-foreground font-mono text-xs">
-              Error signing in: {error}
-            </p>
+            {flow === "signIn" ? "Sign in" : "Sign up"}
+          </Button>
+          <div className="flex flex-row gap-2 justify-center mt-4">
+            <Text size="sm" color="tertiary" weight="light">
+              {flow === "signIn"
+                ? "Don't have an account?"
+                : "Already have an account?"}
+            </Text>
+            <Text
+              as="span"
+              size="sm"
+              color="sage-600"
+              className="hover:text-sage-700 cursor-pointer font-medium transition-colors"
+              onClick={() => setFlow(flow === "signIn" ? "signUp" : "signIn")}
+            >
+              {flow === "signIn" ? "Sign up instead" : "Sign in instead"}
+            </Text>
           </div>
-        )}
-      </form>
-    </div>
+          {error && (
+            <Card variant="outlined" className="mt-4 bg-red-50 border-red-200" padding="sm">
+              <Text size="sm" className="text-red-700">
+                Error signing in: {error}
+              </Text>
+            </Card>
+          )}
+        </form>
+      </Card>
+    </PageLayout>
   );
 }

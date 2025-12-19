@@ -30,7 +30,7 @@ export const sendTip = mutation({
     }
     
     // Check if tips are enabled for this creator
-    if (!recipientProfile.settings.allowTips) {
+    if (!recipientProfile.settings?.allowTips) {
       throw new Error("This creator has not enabled tips");
     }
     
@@ -53,7 +53,7 @@ export const sendTip = mutation({
         const now = new Date();
         await ctx.db.insert("analytics", {
           videoId: args.videoId,
-          profileId: video.profileId,
+          userId: video.userId,
           eventType: "tip",
           viewerId: identity.subject as Id<"users">,
           timestamp: Date.now(),
@@ -157,7 +157,7 @@ export const getReceivedTips = query({
         
         return {
           ...tip,
-          senderName: sender?.name || "Anonymous",
+          senderName: sender?.displayName || sender?.username || "Anonymous",
           videoTitle: video?.description || "Direct tip",
         };
       })
@@ -283,7 +283,9 @@ export const toggleTips = mutation({
     // Update settings
     await ctx.db.patch(args.userId, {
       settings: {
-        ...user.settings,
+        isPrivate: user.settings?.isPrivate || false,
+        allowMessages: user.settings?.allowMessages || true,
+        allowComments: user.settings?.allowComments || true,
         allowTips: args.enabled,
       },
     });

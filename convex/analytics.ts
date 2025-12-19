@@ -186,8 +186,8 @@ export const getAudienceDemographics = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
     
-    const profile = await ctx.db.get(args.userId);
-    if (!profile) throw new Error("Profile not found");
+    const user = await ctx.db.get(args.userId);
+    if (!user) throw new Error("User not found");
     
     // Check authorization
     if (user._id !== identity.subject) {
@@ -247,8 +247,8 @@ export const getBestTimeToPost = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
     
-    const profile = await ctx.db.get(args.userId);
-    if (!profile) throw new Error("Profile not found");
+    const user = await ctx.db.get(args.userId);
+    if (!user) throw new Error("User not found");
     
     // Check authorization
     if (user._id !== identity.subject) {
@@ -339,8 +339,8 @@ export const getPerformanceTrends = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
     
-    const profile = await ctx.db.get(args.userId);
-    if (!profile) throw new Error("Profile not found");
+    const user = await ctx.db.get(args.userId);
+    if (!user) throw new Error("User not found");
     
     // Check authorization
     if (user._id !== identity.subject) {
@@ -464,7 +464,7 @@ export const updateDailyStats = internalMutation({
         .collect();
       
       // Calculate stats
-      const stats = {
+      const stats: any = {
         userId: creator._id,
         date: today,
         totalViews: events.filter(e => e.eventType === "view").length,
@@ -478,7 +478,7 @@ export const updateDailyStats = internalMutation({
         uniqueViewers: new Set(events.filter(e => e.viewerId).map(e => e.viewerId)).size,
         newFollowers: 0, // Would need to track follows
         avgEngagementRate: 0,
-        topPerformingVideoId: undefined,
+        topPerformingVideoId: undefined as Id<"videos"> | undefined,
       };
       
       // Calculate engagement rate

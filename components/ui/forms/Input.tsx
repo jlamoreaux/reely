@@ -33,7 +33,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label 
             htmlFor={id} 
-            className="block text-sm font-medium text-[#333333] mb-1"
+            className="block text-sm font-medium text-foreground mb-2"
           >
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
@@ -42,7 +42,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666666]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">
               {leftIcon}
             </div>
           )}
@@ -52,14 +52,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={id}
             type={type}
             className={cn(
-              'w-full px-3 py-2 border rounded-lg bg-white text-[#333333] placeholder-[#999999]',
-              'focus:outline-none focus:ring-2 focus:ring-[#7C9885] focus:border-transparent',
+              'w-full px-3 py-2.5 border rounded-lg bg-white dark:bg-sage-900 text-foreground placeholder-text-tertiary',
+              'focus:outline-none focus:ring-2 focus:ring-sage-400 dark:focus:ring-sage-600 focus:border-transparent',
               'disabled:bg-gray-100 disabled:cursor-not-allowed',
               'transition-all duration-200',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               error && 'border-red-500 focus:ring-red-500',
-              !error && 'border-[#E0E0E0]',
+              !error && 'border-border-light dark:border-sage-700',
               inputClassName
             )}
             disabled={disabled}
@@ -70,7 +70,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           />
           
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666]">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary">
               {rightIcon}
             </div>
           )}
@@ -83,7 +83,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         
         {helperText && !error && (
-          <p id={`${id}-helper`} className="mt-1 text-sm text-[#666666]">
+          <p id={`${id}-helper`} className="mt-1 text-sm text-text-secondary">
             {helperText}
           </p>
         )}

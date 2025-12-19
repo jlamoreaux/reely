@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const headerStyles = cn(
     'h-14 md:h-16 px-4 flex items-center justify-between',
-    transparent ? 'bg-transparent' : 'bg-[#F5F5DC] border-b border-[#E0E0E0]',
+    transparent ? 'bg-transparent' : 'bg-cream-100 border-b border-sage-200',
     className
   )
   
@@ -54,11 +54,11 @@ const Header: React.FC<HeaderProps> = ({
         
         {title && (
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg md:text-xl font-semibold text-[#333333] truncate">
+            <h1 className="text-lg md:text-xl font-semibold text-foreground truncate">
               {title}
             </h1>
             {subtitle && (
-              <p className="text-sm text-[#666666] truncate">
+              <p className="text-sm text-sage-500 truncate">
                 {subtitle}
               </p>
             )}
